@@ -8,14 +8,9 @@ class TextClass
 private:
 	struct SentenceType
 	{
-		ID3D11Buffer* vertexBuffer;
-		ID3D11Buffer* indexBuffer;
-		int vertexCount;
-		int indexCount;
-		int maxLenght;
-		float red;
-		float green;
-		float blue;
+		ID3D11Buffer *vertexBuffer, *indexBuffer;
+		int vertexCount, indexCount, maxLength;
+		float red, green, blue;
 	};
 
 	struct VertexType
@@ -33,6 +28,8 @@ public:
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, D3DXMATRIX, D3DXMATRIX);
 
+	bool SetRenderCount(int, ID3D11DeviceContext*);
+
 private:
 	bool InitializeSentence(SentenceType**, int, ID3D11Device*);
 	bool UpdateSentence(SentenceType*, char*, int, int, float, float, float, ID3D11DeviceContext*);
@@ -42,11 +39,8 @@ private:
 private:
 	FontClass* m_Font;
 	FontShaderClass* m_FontShader;
-	int m_screenWidth;
-	int m_screenHeight;
+	int m_screenWidth, m_screenHeight;
 	D3DXMATRIX m_baseViewMatrix;
 
-	// Number of sentence type equal to number of sentences that will be used
 	SentenceType* m_sentence1;
-	SentenceType* m_sentence2;
 };

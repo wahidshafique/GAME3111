@@ -20,7 +20,7 @@ ModelClass::~ModelClass()
 
 }
 
-bool ModelClass::Initialize(ID3D11Device* device, char* modelFilename, WCHAR* textureFilename)
+bool ModelClass::Initialize(ID3D11Device* device, WCHAR* textureFilename, char* modelFilename)
 {
 	bool result;
 
@@ -107,7 +107,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	if (FAILED(result))
 		return false;
 
-	// Setup static index buffer description
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -156,13 +155,10 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	stride = sizeof(VertexType);
 	offset = 0;
 
-	// Set vertex buffer to active in the input assembler so it can be rendered
 	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
-	// Set index buffer to active in the input assembler so it can be rendered
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	// Set type of primitive that should be rendered from this vertex buffer
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;

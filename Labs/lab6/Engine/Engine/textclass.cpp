@@ -6,7 +6,6 @@ TextClass::TextClass()
 	m_FontShader = 0;
 
 	m_sentence1 = 0;
-	m_sentence2 = 0;
 }
 
 TextClass::TextClass(const TextClass& other)
@@ -55,22 +54,12 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	}
 
 	// Init first sentence
-	result = InitializeSentence(&m_sentence1, 16, device);
+	result = InitializeSentence(&m_sentence1, 32, device);
 	if (!result)
 		return false;
 
 	// Update sentence vertex buffer with new string info
-	result = UpdateSentence(m_sentence1, "Hello", 100, 100, 1.0f, 1.0f, 1.0f, deviceContext);
-	if (!result)
-		return false;
-
-	// Init second sentence
-	result = InitializeSentence(&m_sentence2, 16, device);
-	if (!result)
-		return false;
-
-	// Update sentence vertex buffer with new string info
-	result = UpdateSentence(m_sentence2, "Goodbye", 100, 200, 1.0f, 1.0f, 1.0f, deviceContext);
+	result = UpdateSentence(m_sentence1, "Render Count: ", 20, 20, 1.0f, 1.0f, 1.0f, deviceContext);
 	if (!result)
 		return false;
 
@@ -81,7 +70,6 @@ void TextClass::Shutdown()
 {
 	// Release same amount of sentences used
 	ReleaseSentence(&m_sentence1);
-	ReleaseSentence(&m_sentence2);
 
 	if (m_FontShader)
 	{
@@ -104,13 +92,8 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatri
 {
 	bool result;
 
-	// Draw first sentence
+	// Draw sentence
 	result = RenderSentence(deviceContext, m_sentence1, worldMatrix, orthoMatrix);
-	if (!result)
-		return false;
-
-	// Draw second sentence
-	result = RenderSentence(deviceContext, m_sentence2, worldMatrix, orthoMatrix);
 	if (!result)
 		return false;
 
@@ -121,10 +104,8 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc;
-	D3D11_BUFFER_DESC indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData;
-	D3D11_SUBRESOURCE_DATA indexData;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
 
@@ -138,7 +119,7 @@ bool TextClass::InitializeSentence(SentenceType** sentence, int maxLength, ID3D1
 	(*sentence)->indexBuffer = 0;
 
 	// Set max length of sentence
-	(*sentence)->maxLenght = maxLength;
+	(*sentence)->maxLength = maxLength;
 
 	// Set num of vertices in the vertex array
 	(*sentence)->vertexCount = 6 * maxLength;
@@ -223,7 +204,7 @@ bool TextClass::UpdateSentence(SentenceType* sentence, char* text, int positionX
 	numLetters = (int)strlen(text);
 
 	// Check for possible buffer overflow
-	if (numLetters > sentence->maxLenght)
+	if (numLetters > sentence->maxLength)
 		return false;
 
 	// Create vertex array
@@ -307,6 +288,27 @@ bool TextClass::RenderSentence(ID3D11DeviceContext* deviceContext, SentenceType*
 	// Render text using the font shader
 	result = m_FontShader->Render(deviceContext, sentence->indexCount, worldMatrix, m_baseViewMatrix, orthoMatrix, m_Font->GetTexture(), pixelColor);
 
+	if (!result)
+		return false;
+
+	return true;
+}
+
+bool TextClass::SetRenderCount(int count, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[32];
+	char countString[32];
+	bool result;
+
+	// Convert count integer to string format
+	_itoa_s(count, tempString, 10);
+
+	// Setup render count string
+	strcpy_s(countString, "Render Count: ");
+	strcpy_s(countString, tempString);
+
+	// Update sentence vertex buffer with new string info
+	result = UpdateSentence(m_sentence1, countString, 20, 20, 1.0f, 1.0f, 1.0f, deviceContext);
 	if (!result)
 		return false;
 

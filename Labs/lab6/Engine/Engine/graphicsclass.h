@@ -1,22 +1,18 @@
-#ifndef _GRAPHICSCLASS_H_
-#define _GRAPHICSCLASS_H_
-
-
-/////////////
-// GLOBALS //
-/////////////
-const bool FULL_SCREEN = true;
-const bool VSYNC_ENABLED = true;
-const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.1f;
+#pragma once
 #include "d3dclass.h"
 #include "cameraclass.h"
-#include "textclass.h"
 #include "modelclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
+#include "textclass.h"
 #include "modellistclass.h"
 #include "frustumclass.h"
+
+const bool FULL_SCREEN = false;
+const bool VSYNC_ENABLED = true;
+const float SCREEN_DEPTH = 1000.0f;
+const float SCREEN_NEAR = 0.1f;
+
 class GraphicsClass
 {
 public:
@@ -32,12 +28,10 @@ public:
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	TextClass* m_Text;
 	ModelClass* m_Model;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
+	TextClass* m_Text;
 	ModelListClass* m_ModelList;
 	FrustumClass* m_Frustum;
 };
-
-#endif
