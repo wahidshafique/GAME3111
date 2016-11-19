@@ -22,7 +22,7 @@ public:
 
 private:
 	bool Render();
-	//void tesselator;//revenge of 
+	float tessellator(float cameraDistZ);
 
 private:
 	D3DClass* m_D3D;

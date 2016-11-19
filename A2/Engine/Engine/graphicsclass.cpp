@@ -47,7 +47,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -60.0f);//A2: move the camera closer to triangle (cannot exceed 0 else it will overshoot)
+	m_Camera->SetPosition(0.0f, 0.0f, -66.0f);//A2: move the camera closer to triangle (cannot exceed 0 else it will overshoot)
 
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -156,17 +156,30 @@ bool GraphicsClass::Render()
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
 
-	// Render the model using the color shader.
+	// Render the model using the color shader. A2
 	auto clip = [](float n, float lower, float upper) {return (std::max)(lower, (std::min)(n, upper)); };//lambda to clamp the values
-	float tessOffset = clip(64 - std::abs(m_Camera->GetPosition().z), 1, 64);//the offeset is exactly the distance from triangle
+	float cameraZ = std::abs(m_Camera->GetPosition().z);
+	float tessOffset =  clip(tessellator(clip(cameraZ, 1.0f, 64.0f)), 1.0f, 64.0f);
 	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, tessOffset);
 	if (!result)
 	{
 		return false;
 	}
-
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
 
 	return true;
+}
+
+float GraphicsClass::tessellator(float cameraDistZ) {//A2 Judgment Day
+	//creates an arbitrary tess factor based on distance
+	float finalCamVal = cameraDistZ;
+
+	if (cameraDistZ < 14) finalCamVal = cameraDistZ * 1.6;
+	else if (cameraDistZ < 24) finalCamVal = cameraDistZ * 2.5;
+	else if (cameraDistZ < 34) finalCamVal = cameraDistZ * 1.4;
+	else if (cameraDistZ < 44) finalCamVal = cameraDistZ * 1.3;
+	else if (cameraDistZ < 54) finalCamVal = cameraDistZ * 1.2;
+	else if (cameraDistZ < 64) finalCamVal = cameraDistZ * 1.1;
+	return 64.0f - finalCamVal;
 }
