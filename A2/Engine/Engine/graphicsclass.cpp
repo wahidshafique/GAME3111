@@ -1,5 +1,5 @@
 #include "graphicsclass.h"
-
+#include <algorithm>
 GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
@@ -47,7 +47,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -45.0f);//A2: move the camera closer to triangle (cannot exceed 0 else it will overshoot)
+	m_Camera->SetPosition(0.0f, 0.0f, -60.0f);//A2: move the camera closer to triangle (cannot exceed 0 else it will overshoot)
 
 	// Create the model object.
 	m_Model = new ModelClass;
@@ -157,11 +157,8 @@ bool GraphicsClass::Render()
 	m_Model->Render(m_D3D->GetDeviceContext());
 
 	// Render the model using the color shader.
-	//auto glambda = [](auto a, auto&& b) { return a < b; };
-	//return std::max(lower, std::min(n, upper));
-	auto clip = [](auto n, auto lower, auto upper) {return (std::max(lower, std::min(n, upper)))};
-	//64 - std::abs(m_Camera->GetPosition().z) //64 - 3 = 61....64 - 64
-	float tessOffset = 64 - std::abs(m_Camera->GetPosition().z);
+	auto clip = [](float n, float lower, float upper) {return (std::max)(lower, (std::min)(n, upper)); };//lambda to clamp the values
+	float tessOffset = clip(64 - std::abs(m_Camera->GetPosition().z), 1, 64);//the offeset is exactly the distance from triangle
 	result = m_ColorShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, tessOffset);
 	if (!result)
 	{
